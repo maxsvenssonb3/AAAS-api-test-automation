@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ORGANIZATION-NAME</groupId> <!-- AzureDevops organization name -->
+    <artifactId>ARTIFACT-NAME</artifactId> <!-- Project artifact name -->
+    <version>ARTIFACT-VERSION</version> <!-- Project artifact version -->
+
+    <properties>
+        <artifact.feed.name>ARTIFACT-FEED-NAME</artifact.feed.name> <!-- AzureDevops build artifact feed name -->
+        <artifact.feed.url> <!-- AzureDevops build artifact feed url -->
+            https://pkgs.dev.azure.com/ORGANIZATION-NAME/PROJECT-NAME/_packaging/ARTIFACT-FEED-NAME/maven/v1
+        </artifact.feed.url>
+        <organization.name>ORGANIZATION-NAME</organization.name> <!-- AzureDevops organization name -->
+        <artifact.name>SCHEMA-AND-API-CLIENT-CODE-ARTIFACT-NAME</artifact.name> <!-- AzureDevops artifact name -->
+        <artifact.version>API-CLIENT-CODE-AND-SCHEMA-ARTIFACT-VERSION</artifact.version> <!-- AzureDevops artifact version -->
+        <maven.compiler.source>use-same-version-in-pipeline</maven.compiler.source> <!-- Java version -->
+        <maven.compiler.target>use-same-version-in-pipeline</maven.compiler.target> <!-- Java version -->
+        <kotlin.version>1.9.10</kotlin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
+        <testng.version>7.8.0</testng.version>
+        <rest.assured.version>5.3.2</rest.assured.version>
+        <maven.surefire.plugin.version>3.2.1</maven.surefire.plugin.version>
+    </properties>
+
+    <dependencies>
+        <!-- Jar from AzureDevops build artifact feed -->
+        <dependency>
+            <groupId>${organization.name}</groupId>
+            <artifactId>${artifact.name}</artifactId>
+            <version>${artifact.version}</version>
+        </dependency>
+
+        <!-- Utility -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+
+        <!-- Testing libraries -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>${rest.assured.version}</version>
+        </dependency>
+
+        <!-- Kotlin -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- AzureDevops build artifact feed repository -->
+    <repositories>
+        <repository>
+            <id>${artifact.feed.name}</id>
+            <url>${artifact.feed.url}</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <!-- Kotlin compiler -->
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <source>src/test/kotlin</source>
+                                <source>target/generated-test-sources/test-annotations</source>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>${maven.compiler.target}</jvmTarget>
+                </configuration>
+            </plugin>
+
+            <!-- Java compiler -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>none</phase>
+                    </execution>
+
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Allows pipeline to succeed with failed tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <testFailureIgnore>true</testFailureIgnore>
+                </configuration>
+                <dependencies>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,16 @@
+{
+  "testData": [
+    {
+      "stationId": "51468",
+      "testId": "1",
+      "ghej": false,
+      "isTestActive": true
+    },
+    {
+      "stationId": "51468",
+      "testId": "2",
+      "ghej": false,
+      "isTestActive": true
+    }
+  ]
+}
